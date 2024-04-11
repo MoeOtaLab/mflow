@@ -8,11 +8,18 @@ import { type IInputOperatorData, type IOutputOperatorData } from '../../Operato
 import { type OutputOperator } from '../../Operators/OutputOperator';
 import { type InputOperator } from '../../Operators/InputOperator';
 import { type ModelBlock, ModelState, Action } from '@eos/core';
+import React from 'react';
 
 export const Demo: React.FC = () => {
   const { store, nodes, edges } = useLinkRuntimeContext();
 
-  const [instance, setInstance] = useState<ModelBlock>();
+  const keyRef = useRef(1);
+  const [instance, _setInstance] = useState<ModelBlock>();
+
+  const setInstance: typeof _setInstance = (action) => {
+    keyRef.current += 1;
+    return _setInstance(action);
+  };
   const inputStateMapRef = useRef<Record<string, ModelState<any>>>({});
   const nodeGraph = new NodeGraph(nodes, edges);
 
@@ -97,7 +104,7 @@ export const Demo: React.FC = () => {
       }}
     >
       {instance?.output && (
-        <>
+        <React.Fragment key={keyRef.current}>
           <div>
             <div style={{ display: 'grid', gap: 12 }}>
               <div style={{ display: 'grid', gap: 12 }}>
@@ -159,7 +166,7 @@ export const Demo: React.FC = () => {
               );
             })}
           </div>
-        </>
+        </React.Fragment>
       )}
     </div>
   );
