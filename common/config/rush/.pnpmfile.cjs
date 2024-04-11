@@ -34,5 +34,16 @@ function readPackage(packageJson, context) {
   //  packageJson.dependencies['log4js'] = '0.6.38';
   // }
 
+  if (
+    [
+      '@designable/react',
+      '@designable/react-settings-form',
+      '@formily/antd'
+    ].includes(packageJson.name)
+  ) {
+    delete packageJson.peerDependencies['antd']
+    packageJson.dependencies['antd'] = '4.15.4'
+  }
+
   return packageJson;
 }

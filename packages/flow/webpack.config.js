@@ -17,7 +17,10 @@ const config = {
   },
   devServer: {
     open: ['/eos'],
-    host: 'localhost'
+    host: 'localhost',
+    client: {
+      overlay: false
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -36,7 +39,19 @@ const config = {
       },
       {
         test: /\.less$/i,
-        use: [stylesHandler, 'css-loader', 'postcss-loader', 'less-loader']
+        use: [
+          stylesHandler,
+          'css-loader',
+          'postcss-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true
+              }
+            }
+          }
+        ]
       },
       {
         test: /\.s[ac]ss$/i,

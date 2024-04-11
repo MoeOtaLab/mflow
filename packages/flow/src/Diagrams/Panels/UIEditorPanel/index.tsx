@@ -1,7 +1,9 @@
-import { useRef } from 'react';
+import { UIEditor } from './UIEditor';
 
 export function UIEditorPanel() {
-  const divRef = useRef<HTMLDivElement>(null);
-
-  return <div ref={divRef}></div>;
+  return (
+    <div>
+      <UIEditor />
+    </div>
+  );
 }
