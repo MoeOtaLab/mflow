@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle, type ForwardedRef } from 'react';
 import classnames from 'classnames';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from 'monaco-editor';
 import styles from './Editor.module.css';
 import { useUpdateEffect } from 'ahooks';
-import './UserWorker';
 
 export interface IEditorRefType {
   editor: monaco.editor.IStandaloneCodeEditor | null;
