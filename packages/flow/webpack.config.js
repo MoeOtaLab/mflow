@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const WebpackBar = require('webpackbar');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -20,13 +21,22 @@ const config = {
     host: 'localhost',
     client: {
       overlay: false
+    },
+    setupMiddlewares: (middlewares, devServer) => {
+      devServer.app.get('/', (req, res) => {
+        res.location('/eos');
+        res.sendStatus(307);
+      });
+
+      return middlewares;
     }
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html'
     }),
-    new MonacoWebpackPlugin()
+    new MonacoWebpackPlugin(),
+    new WebpackBar()
   ],
   module: {
     rules: [
@@ -75,7 +85,8 @@ const config = {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
     fallback: { path: require.resolve('path-browserify'), assert: false }
   },
-  externals: {}
+  externals: {},
+  stats: 'minimal'
 };
 
 module.exports = () => {
