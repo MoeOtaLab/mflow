@@ -1,0 +1,102 @@
+.container {
+}
+
+.file-tree-container {
+  display: flex;
+  flex-flow: column;
+}
+
+@fileItemRowGap: 2px;
+
+.indent {
+  position: relative;
+  width: 4px;
+  margin-right: 0.5em;
+  height: 22px;
+  flex: 0 0 auto;
+
+  &::before {
+    position: absolute;
+    content: '';
+    width: 1px;
+    left: 6px;
+    top: -@fileItemRowGap;
+    bottom: -@fileItemRowGap;
+    background-color: #d9d9d9;
+  }
+
+  &.highlight {
+    &::before {
+      background-color: #bdbdbd;
+    }
+  }
+}
+
+.file-item {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: (@fileItemRowGap - 1px) 8px;
+
+  cursor: pointer;
+
+  border: 1px solid transparent;
+
+  user-select: none;
+
+  &:hover,
+  &.selected {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &.selected {
+    border: 1px solid rgba(22, 119, 255, 0.745);
+  }
+
+  &.dragging-start {
+    color: white;
+
+    .indent {
+      visibility: hidden;
+    }
+  }
+}
+
+.expand-icon {
+  font-size: 12px;
+  margin-right: 4px;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.icon {
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.action-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  padding: @fileItemRowGap 0;
+  gap: 4px;
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(217, 217, 217, 0.525);
+  }
+}

@@ -7,7 +7,9 @@ const WebpackBar = require('webpackbar');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
-const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader';
+const stylesHandler = isProduction
+  ? MiniCssExtractPlugin.loader
+  : 'style-loader';
 
 /** @type {import('webpack').Configuration} */
 const config = {
@@ -17,7 +19,6 @@ const config = {
     publicPath: '/eos'
   },
   devServer: {
-    open: ['/eos'],
     host: 'localhost',
     client: {
       overlay: false
@@ -51,7 +52,16 @@ const config = {
         test: /\.less$/i,
         use: [
           stylesHandler,
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: isProduction
+                  ? undefined
+                  : '[name]__[local]--[hash:base64:5]'
+              }
+            }
+          },
           'postcss-loader',
           {
             loader: 'less-loader',

@@ -2,7 +2,7 @@
 module.exports = {
   // We use a larger print width because Prettier's word-wrapping seems to be tuned
   // for plain JavaScript without type annotations
-  printWidth: 110,
+  printWidth: 80,
 
   // Use .gitattributes to manage newlines
   endOfLine: 'auto',
@@ -14,5 +14,7 @@ module.exports = {
   // to use them for arrays only
   trailingComma: 'none',
 
-  plugins: ['./common/autoinstallers/rush-prettier/node_modules/prettier-plugin-packagejson/lib/index.js']
+  plugins: [
+    './common/autoinstallers/rush-prettier/node_modules/prettier-plugin-packagejson/lib/index.js'
+  ]
 };

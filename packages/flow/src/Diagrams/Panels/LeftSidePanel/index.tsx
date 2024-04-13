@@ -1,31 +1,36 @@
-import { Tabs } from 'antd';
-import { ControlOutlined, FileAddOutlined, FunctionOutlined } from '@ant-design/icons';
+import {
+  ControlOutlined,
+  FileAddOutlined,
+  FunctionOutlined
+} from '@ant-design/icons';
 import { OperatorPanel } from '../OperatorPanel';
 import { LayerPanel } from '../LayerPanel';
 import { CommandPanel } from '../CommandPanel';
+import { NavigationMenu } from './components/NavigationMenu';
 import css from './LeftSidePanel.module.less';
 
 export function LeftSidePanel() {
   return (
     <div className={css.container}>
-      <Tabs
-        size="small"
-        tabPosition={'left'}
+      <NavigationMenu
         items={[
           {
-            label: <FunctionOutlined rev="" />,
+            icon: <FunctionOutlined rev="" />,
+            label: 'Operators',
             key: 'Operators',
-            children: <OperatorPanel />
+            content: <OperatorPanel />
           },
           {
-            label: <FileAddOutlined rev="" />,
+            icon: <FileAddOutlined rev="" />,
             key: 'Layers',
-            children: <LayerPanel />
+            label: 'Layers',
+            content: <LayerPanel />
           },
           {
-            label: <ControlOutlined rev="" />,
+            icon: <ControlOutlined rev="" />,
             key: 'commands',
-            children: <CommandPanel />
+            label: 'commands',
+            content: <CommandPanel />
           }
         ]}
       />
