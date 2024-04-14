@@ -1,4 +1,4 @@
-import React, { type DragEventHandler } from 'react';
+import React, { useEffect, type DragEventHandler } from 'react';
 import { useOperators } from '../../State/OperatorProvider';
 import { CustomOperator } from '../../Operators/CustomOperator';
 import { registerOperators } from '../../Operators';
@@ -81,6 +81,14 @@ export const OperatorPanel: React.FC = () => {
   const defaultOperators = operators.filter((item) => !item.isCustom);
   const customOperators = operators.filter((item) => item.isCustom);
 
+  useEffect(() => {
+    if (!customOperators?.length) {
+      const customOperator = new CustomOperator('custom');
+      registerOperators([customOperator]);
+      refreshOperators();
+    }
+  }, []);
+
   return (
     <div className={css.container}>
       <FileManager
@@ -113,9 +121,11 @@ export const OperatorPanel: React.FC = () => {
           {
             title: 'App',
             key: 'App',
-            isLeaf: true
+            isLeaf: true,
+            draggable: false
           }
         ]}
+        defaultExpandedKeys={['Default', 'Custom']}
         getNewFile={() => {
           return {};
         }}

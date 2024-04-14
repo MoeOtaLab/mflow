@@ -64,7 +64,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 };
 
 export const FlowDiagram: React.FC = () => {
-  const { nodes, edges, setNodes, setEdges } = useDiagramsContext();
+  const { nodes, edges, setNodes, setEdges, layer } = useDiagramsContext();
   const { actionsRef, currentStateRef } = useDiagramsHookOption();
 
   const addSelectedEdges = useStore((ctx) => ctx.addSelectedEdges);
@@ -117,6 +117,11 @@ export const FlowDiagram: React.FC = () => {
 
   const handleDrop: DragEventHandler = (event) => {
     const operatorType = event.dataTransfer.getData(OPERATOR_TYPE_DATA);
+    if (layer.relativeOperatorType === operatorType) {
+      message.warning(
+        'use operation itself in operator, be careful for looping'
+      );
+    }
     if (operatorType) {
       const operator = getOperatorFromOperatorType(operatorType);
       if (operator) {

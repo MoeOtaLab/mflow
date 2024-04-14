@@ -97,7 +97,7 @@ export function FileItem(props: {
   return (
     <>
       <div
-        draggable={treeData.isLeaf}
+        draggable={(treeData.draggable ?? true) && treeData.isLeaf}
         onDragStart={(event) => {
           setDraggingStart(true);
           onDragStart?.(event, treeData);

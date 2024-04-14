@@ -4,6 +4,7 @@ export type ITreeDataNode = {
   title: string;
   key: string;
   isLeaf?: boolean;
+  draggable?: boolean;
   children?: ITreeDataNode[];
 };
 
