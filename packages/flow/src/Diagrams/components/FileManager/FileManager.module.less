@@ -48,6 +48,7 @@
   flex-flow: row nowrap;
   align-items: center;
   padding: (@fileItemRowGap - 1px) 8px;
+  height: 24px;
 
   cursor: pointer;
 
@@ -85,6 +86,7 @@
 
 .expand-icon-placeholder {
   width: 12px;
+  flex: 0 0 auto;
 }
 
 .icon {
@@ -113,5 +115,38 @@
 
   &:hover {
     background-color: rgba(217, 217, 217, 0.525);
+  }
+}
+
+.input {
+  background: none;
+  border: none;
+  appearance: none;
+  padding: 0;
+  outline: none;
+  font-size: inherit;
+  color: inherit;
+  width: 100%;
+  font-family: inherit;
+}
+
+.title {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  flex: 1 1 auto;
+
+  position: relative;
+
+  &.editing::before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: -@fileItemRowGap;
+    bottom: -@fileItemRowGap;
+    left: 0;
+    right: -9px;
+    border: 1px solid rgba(22, 119, 255, 0.745);
+    pointer-events: none;
   }
 }

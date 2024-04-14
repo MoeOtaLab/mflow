@@ -15,7 +15,7 @@ import {
   SwitcherOutlined
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { useControllableValue } from 'ahooks';
+import { useControllableValue, useLatest } from 'ahooks';
 
 type IFileManagerProps = {
   defaultTreeData?: ITreeDataNode[];
@@ -109,6 +109,15 @@ export function FileManager(props: IFileManagerProps) {
     trigger: 'onExpandedKeysChange'
   });
 
+  const [editingKey, setEditingKey] = useControllableValue<
+    IFileManagerContext['editingKey']
+  >(props, {
+    defaultValue: '',
+    defaultValuePropName: 'defaultEditingKey',
+    valuePropName: 'editingKey',
+    trigger: 'onEditingKeyChange'
+  });
+
   const rootTreeData = useMemo(() => {
     return treeData?.map((item) => convertTreeData(item));
   }, [treeData]);
@@ -121,6 +130,9 @@ export function FileManager(props: IFileManagerProps) {
       (treeNode) => treeNode.key === activeOrFocusKey
     );
   }, [activeOrFocusKey, rootTreeData]);
+
+  const activeOrFocusKeyRef = useLatest(activeOrFocusKey);
+  const editingKeyRef = useLatest(editingKey);
 
   const highlightKey = useMemo(() => {
     if (activeOrFocusKey && expandedKeys.includes(activeOrFocusKey)) {
@@ -148,6 +160,31 @@ export function FileManager(props: IFileManagerProps) {
     document.addEventListener('click', handleClick, false);
     return () => {
       document.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!activeOrFocusKeyRef.current) {
+        return;
+      }
+
+      if (
+        editingKeyRef.current &&
+        editingKeyRef.current === activeOrFocusKeyRef.current
+      ) {
+        return;
+      }
+
+      if (event.key === 'Enter') {
+        setEditingKey(activeOrFocusKeyRef.current);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -256,7 +293,9 @@ export function FileManager(props: IFileManagerProps) {
             highlightKey,
             onDragStart,
             focusKey,
-            setFocusKey
+            setFocusKey,
+            editingKey,
+            setEditingKey
           }}
         >
           {rootTreeData?.map((item) => <FileItem indent={0} treeData={item} />)}

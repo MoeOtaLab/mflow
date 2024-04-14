@@ -8,7 +8,7 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 import { FileManagerContext, IHandledTreeDataNode } from './FileManagerContext';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function FileItem(props: {
   treeData: IHandledTreeDataNode;
@@ -50,6 +50,16 @@ export function FileItem(props: {
     (ctx) => ctx.highlightKey
   );
 
+  const isEditing = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.editingKey === treeData.key
+  );
+
+  const setEditingKey = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.setEditingKey
+  );
+
   const highlightIndex = useMemo(() => {
     let i = indent;
     let currentNode: IHandledTreeDataNode | undefined = treeData;
@@ -65,6 +75,15 @@ export function FileItem(props: {
 
   const [draggingStart, setDraggingStart] = useState(false);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
+
   return (
     <>
       <div
@@ -78,10 +97,14 @@ export function FileItem(props: {
         }}
         className={classnames(css['file-item'], {
           [css.selected]: isActive,
-          [css.focus]: isFocus,
+          [css.focus]: isFocus && !isEditing,
           [css['dragging-start']]: draggingStart
         })}
         onClick={() => {
+          if (isEditing) {
+            return;
+          }
+
           setFocusKey(treeData?.key);
           if (treeData.isLeaf) {
             setActiveKey(treeData?.key);
@@ -129,7 +152,25 @@ export function FileItem(props: {
             <FolderOutlined />
           )}
         </div>
-        <div>{treeData.title}</div>
+        <div
+          className={classnames(css.title, {
+            [css.editing]: isEditing
+          })}
+        >
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              className={css.input}
+              type="text"
+              defaultValue={treeData.title}
+              onBlur={() => {
+                setEditingKey(undefined);
+              }}
+            />
+          ) : (
+            treeData.title
+          )}
+        </div>
       </div>
       {isExpanded &&
         treeData.children?.map((item) => (
