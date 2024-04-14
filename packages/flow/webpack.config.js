@@ -56,6 +56,7 @@ const config = {
             loader: 'css-loader',
             options: {
               modules: {
+                auto: /\.module\.less$/,
                 localIdentName: isProduction
                   ? undefined
                   : '[name]__[local]--[hash:base64:5]'

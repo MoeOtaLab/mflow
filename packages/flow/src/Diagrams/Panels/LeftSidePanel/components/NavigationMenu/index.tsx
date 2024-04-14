@@ -48,10 +48,12 @@ export function NavigationMenu(props: INavigationMenuProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const defaultWidth = 200;
-  const [width, setWidth] = useState<number>(200);
+  const [innerWidth, setWidth] = useState<number>(200);
   function resetWidth() {
     setWidth(defaultWidth);
   }
+
+  const width = activeKey ? innerWidth : 0;
 
   return (
     <div className={css.container}>
