@@ -38,7 +38,10 @@ type IFileManagerProps = {
   ) => void;
   onDragStart?: IFileManagerContext['onDragStart'];
   getNewFile?: () => Partial<ITreeDataNode>;
-  onFileChange?: (activeTreeNode: ITreeDataNode, type: FileChangeEnum) => void;
+  onFileChange?: (
+    activeTreeNode: ITreeDataNode,
+    type: FileChangeEnum
+  ) => ITreeDataNode | undefined;
 };
 
 const ROOT_FOCUS_KEY = '__ROOT_FOCUS_KEY__';
@@ -164,9 +167,14 @@ export function FileManager(props: IFileManagerProps) {
     if (fileData?.key === pendingAddItem?.key) {
       if (!fileData.title) {
         setPendingAddItem(undefined);
+        setEditingKey(undefined);
       } else {
-        onFileChange?.(fileData, FileChangeEnum.Add);
+        const targetFile =
+          onFileChange?.(fileData, FileChangeEnum.Add) || fileData;
         setPendingAddItem(undefined);
+        setActiveKey(targetFile?.key);
+        setFocusKey(targetFile?.key);
+        setEditingKey(undefined);
       }
     }
   });
@@ -214,7 +222,7 @@ export function FileManager(props: IFileManagerProps) {
         return;
       }
 
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && !editingKeyRef.current) {
         setEditingKey(activeOrFocusKeyRef.current);
       }
     }

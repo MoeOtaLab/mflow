@@ -178,11 +178,15 @@ export function FileItem(props: {
                   ...treeData,
                   title: event.target.value
                 });
-                setEditingKey(undefined);
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
-                  setEditingKey(undefined);
+                  handleFileChange?.({
+                    ...treeData,
+                    // @ts-expect-error
+                    title: event.target.value
+                  });
+                  event.stopPropagation();
                 }
               }}
             />

@@ -63,6 +63,11 @@ export const OperatorPanel: React.FC = () => {
             const customOperator = new CustomOperator(file.title);
             registerOperators([customOperator]);
             refreshOperators();
+            return {
+              ...file,
+              key: customOperator.operatorType,
+              isLeaf: true
+            };
           }
 
           if (type === FileChangeEnum.Delete) {
@@ -80,6 +85,8 @@ export const OperatorPanel: React.FC = () => {
               }
             });
           }
+
+          return undefined;
         }}
       />
     </div>
