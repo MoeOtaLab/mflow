@@ -11,7 +11,6 @@ import css from './Diagram.module.less';
 
 enum PanelEnum {
   Model = 'Model',
-  Binding = 'Binding',
   UI = 'UI'
 }
 
@@ -38,7 +37,6 @@ export const Diagram: React.FC = () => {
           size="small"
         >
           <Radio.Button value={PanelEnum.Model}>Model</Radio.Button>
-          <Radio.Button value={PanelEnum.Binding}>Binding</Radio.Button>
           <Radio.Button value={PanelEnum.UI}>UI</Radio.Button>
         </Radio.Group>
       </div>
@@ -54,7 +52,6 @@ export const Diagram: React.FC = () => {
               </div>
             </div>
           )}
-          {currentPanel === PanelEnum.Binding && <>coming soon</>}
           {currentPanel === PanelEnum.UI && (
             <div key={currentPanel}>
               <UIEditorPanel />
