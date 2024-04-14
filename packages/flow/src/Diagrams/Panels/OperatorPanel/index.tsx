@@ -3,8 +3,12 @@ import { useOperators } from '../../State/OperatorProvider';
 import { CustomOperator } from '../../Operators/CustomOperator';
 import { registerOperators } from '../../Operators';
 import css from './OperatorPanel.module.less';
-import { Input, type InputRef, Modal, message } from 'antd';
-import { FileManager } from '../../components/FileManager';
+import { FileChangeEnum, FileManager } from '../../components/FileManager';
+import {
+  getOperatorFromOperatorType,
+  removeOperators
+} from '../../Operators/OperatorMap';
+import { Modal, message } from 'antd';
 
 export const OPERATOR_TYPE_DATA = 'operator_type';
 
@@ -51,48 +55,31 @@ export const OperatorPanel: React.FC = () => {
             }))
           }
         ]}
-        onAddFile={() => {
-          let name = '';
-          function addCustomOperator() {
-            if (!name) {
-              message.warning('Please input name');
-              return;
-            }
-
-            const customOperator = new CustomOperator(name);
+        getNewFile={() => {
+          return {};
+        }}
+        onFileChange={(file, type) => {
+          if (type === FileChangeEnum.Add) {
+            const customOperator = new CustomOperator(file.title);
             registerOperators([customOperator]);
             refreshOperators();
           }
-          let inputRef: InputRef | undefined | null;
-          const instance = Modal.info({
-            title: 'Custom Operator Name',
-            content: (
-              <div>
-                <Input
-                  ref={(ref) => {
-                    inputRef = ref;
-                  }}
-                  onChange={(e) => {
-                    name = e.target.value || '';
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      instance.destroy();
-                      addCustomOperator();
-                    }
-                  }}
-                />
-              </div>
-            ),
-            onOk() {
-              addCustomOperator();
-            }
-          });
 
-          setTimeout(() => {
-            console.log('inputRef', inputRef);
-            inputRef?.input?.focus();
-          }, 200);
+          if (type === FileChangeEnum.Delete) {
+            const operator = getOperatorFromOperatorType(file.key);
+            if (!operator?.isCustom) {
+              message.warning(`can not delete default operator: ${file.title}`);
+              return;
+            }
+
+            Modal.confirm({
+              title: ` Are you sure you want to delete ${file.title}`,
+              onOk() {
+                removeOperators(file.key);
+                refreshOperators();
+              }
+            });
+          }
         }}
       />
     </div>

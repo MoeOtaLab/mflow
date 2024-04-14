@@ -2,7 +2,7 @@ import { createContext } from 'use-context-selector';
 
 export type ITreeDataNode = {
   title: string;
-  key: string | number;
+  key: string;
   isLeaf?: boolean;
   children?: ITreeDataNode[];
 };
@@ -28,10 +28,13 @@ export type IFileManagerContext = {
   >;
   rootTreeData: IHandledTreeDataNode[];
   highlightKey?: ITreeDataNode['key'];
+  pendingAddItem?: IHandledTreeDataNode;
   onDragStart?: (
     event: React.DragEvent<Element>,
     treeNode: IHandledTreeDataNode
   ) => void;
+
+  handleFileChange?: (file: IHandledTreeDataNode) => void;
 };
 
 export const FileManagerContext = createContext<IFileManagerContext>({
@@ -43,6 +46,8 @@ export const FileManagerContext = createContext<IFileManagerContext>({
   highlightKey: '',
   setActiveKey: () => {},
   editingKey: '',
+  pendingAddItem: undefined,
   setEditingKey: () => {},
-  rootTreeData: []
+  rootTreeData: [],
+  handleFileChange: () => {}
 });

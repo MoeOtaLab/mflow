@@ -1,6 +1,6 @@
 import css from './FileManager.module.less';
 import classnames from 'classnames';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FileManagerContext,
   IFileManagerContext,
@@ -15,7 +15,12 @@ import {
   SwitcherOutlined
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { useControllableValue, useLatest } from 'ahooks';
+import { useControllableValue, useLatest, useMemoizedFn } from 'ahooks';
+
+export enum FileChangeEnum {
+  Add = 'Add',
+  Delete = 'Delete'
+}
 
 type IFileManagerProps = {
   defaultTreeData?: ITreeDataNode[];
@@ -32,7 +37,8 @@ type IFileManagerProps = {
     expandedKey: IFileManagerContext['expandedKeys']
   ) => void;
   onDragStart?: IFileManagerContext['onDragStart'];
-  onAddFile?: (activeTreeNode?: ITreeDataNode) => void;
+  getNewFile?: () => Partial<ITreeDataNode>;
+  onFileChange?: (activeTreeNode: ITreeDataNode, type: FileChangeEnum) => void;
 };
 
 const ROOT_FOCUS_KEY = '__ROOT_FOCUS_KEY__';
@@ -74,7 +80,7 @@ function findTargetTreeNode(
 }
 
 export function FileManager(props: IFileManagerProps) {
-  const { onDragStart, onAddFile } = props;
+  const { onDragStart, onFileChange, getNewFile } = props;
   const [treeData] = useControllableValue<ITreeDataNode[]>(props, {
     defaultValue: [],
     defaultValuePropName: 'defaultTreeData',
@@ -118,6 +124,8 @@ export function FileManager(props: IFileManagerProps) {
     trigger: 'onEditingKeyChange'
   });
 
+  const [pendingAddItem, setPendingAddItem] = useState<IHandledTreeDataNode>();
+
   const rootTreeData = useMemo(() => {
     return treeData?.map((item) => convertTreeData(item));
   }, [treeData]);
@@ -133,6 +141,8 @@ export function FileManager(props: IFileManagerProps) {
 
   const activeOrFocusKeyRef = useLatest(activeOrFocusKey);
   const editingKeyRef = useLatest(editingKey);
+  const focusKeyRef = useLatest(focusKey);
+  const activeOrFocusTreeNodeRef = useLatest(activeOrFocusTreeNode);
 
   const highlightKey = useMemo(() => {
     if (activeOrFocusKey && expandedKeys.includes(activeOrFocusKey)) {
@@ -143,6 +153,23 @@ export function FileManager(props: IFileManagerProps) {
   }, [activeKey, activeOrFocusTreeNode, expandedKeys]);
 
   const treeContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleFileChange = useMemoizedFn<
+    NonNullable<IFileManagerContext['handleFileChange']>
+  >((fileData) => {
+    if (!fileData) {
+      return;
+    }
+
+    if (fileData?.key === pendingAddItem?.key) {
+      if (!fileData.title) {
+        setPendingAddItem(undefined);
+      } else {
+        onFileChange?.(fileData, FileChangeEnum.Add);
+        setPendingAddItem(undefined);
+      }
+    }
+  });
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -169,10 +196,21 @@ export function FileManager(props: IFileManagerProps) {
         return;
       }
 
+      console.log('event.key', event.key, event.ctrlKey, event);
+      // ============== handle delete ============ //
+      if (
+        focusKeyRef.current &&
+        activeOrFocusTreeNodeRef.current?.key === focusKeyRef.current &&
+        event.key === 'Backspace' &&
+        (event.metaKey || event.ctrlKey)
+      ) {
+        onFileChange?.(activeOrFocusTreeNodeRef.current, FileChangeEnum.Delete);
+      }
       if (
         editingKeyRef.current &&
         editingKeyRef.current === activeOrFocusKeyRef.current
       ) {
+        // ============== handle edit ============ //
         return;
       }
 
@@ -210,7 +248,19 @@ export function FileManager(props: IFileManagerProps) {
                 targetActiveNode = activeOrFocusTreeNode?.parent;
               }
 
-              onAddFile?.(targetActiveNode);
+              const newFile = getNewFile?.() || {};
+
+              const pendingAddItem = {
+                title: '',
+                key: Math.random().toString(36),
+                parent: targetActiveNode,
+                isLeaf: true,
+                ...newFile
+              };
+
+              setPendingAddItem(pendingAddItem);
+              setFocusKey(pendingAddItem.key);
+              setEditingKey(pendingAddItem.key);
             }}
           >
             <FileAddOutlined />
@@ -295,10 +345,21 @@ export function FileManager(props: IFileManagerProps) {
             focusKey,
             setFocusKey,
             editingKey,
-            setEditingKey
+            setEditingKey,
+            pendingAddItem,
+            handleFileChange
           }}
         >
-          {rootTreeData?.map((item) => <FileItem indent={0} treeData={item} />)}
+          {rootTreeData?.map((item) => (
+            <FileItem key={item.key} indent={0} treeData={item} />
+          ))}
+          {pendingAddItem && !pendingAddItem?.parent?.key ? (
+            <FileItem
+              key={pendingAddItem.key}
+              indent={0}
+              treeData={pendingAddItem}
+            />
+          ) : null}
         </FileManagerContext.Provider>
       </div>
     </div>

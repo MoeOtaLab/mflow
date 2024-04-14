@@ -60,6 +60,16 @@ export function FileItem(props: {
     (ctx) => ctx.setEditingKey
   );
 
+  const pendingAddItem = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.pendingAddItem
+  );
+
+  const handleFileChange = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.handleFileChange
+  );
+
   const highlightIndex = useMemo(() => {
     let i = indent;
     let currentNode: IHandledTreeDataNode | undefined = treeData;
@@ -163,8 +173,17 @@ export function FileItem(props: {
               className={css.input}
               type="text"
               defaultValue={treeData.title}
-              onBlur={() => {
+              onBlur={(event) => {
+                handleFileChange?.({
+                  ...treeData,
+                  title: event.target.value
+                });
                 setEditingKey(undefined);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  setEditingKey(undefined);
+                }
               }}
             />
           ) : (
@@ -176,6 +195,13 @@ export function FileItem(props: {
         treeData.children?.map((item) => (
           <FileItem key={item.key} treeData={item} indent={indent + 1} />
         ))}
+      {pendingAddItem && pendingAddItem.parent?.key === treeData.key && (
+        <FileItem
+          key={pendingAddItem.key}
+          treeData={pendingAddItem}
+          indent={indent + 1}
+        />
+      )}
     </>
   );
 }
