@@ -7,7 +7,7 @@ import { Button, Modal } from 'antd';
 import { cloneDeep } from 'lodash';
 import { type Layer } from '../../State/Layer';
 import { Editor } from '../../components/Editor';
-import css from './Editor.module.css';
+import css from './Editor.module.less';
 
 export const ConsolePanel: React.FC = () => {
   const { layer } = useDiagramsState();
@@ -81,7 +81,11 @@ export const ConsolePanel: React.FC = () => {
 
       <div>
         <br />
-        <LinkRuntimeContextProvider value={code} nodes={cacheData.layer.nodes} edges={cacheData.layer.edges}>
+        <LinkRuntimeContextProvider
+          value={code}
+          nodes={cacheData.layer.nodes}
+          edges={cacheData.layer.edges}
+        >
           <Demo />
         </LinkRuntimeContextProvider>
       </div>
@@ -97,7 +101,12 @@ export const ConsolePanel: React.FC = () => {
           setOutputVisible(false);
         }}
       >
-        <Editor language="typescript" readonly={true} className={css.editor} code={output} />
+        <Editor
+          language="typescript"
+          readonly={true}
+          className={css.editor}
+          code={output}
+        />
       </Modal>
     </div>
   );

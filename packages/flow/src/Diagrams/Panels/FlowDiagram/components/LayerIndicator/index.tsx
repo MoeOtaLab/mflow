@@ -1,5 +1,5 @@
-import { getOperatorFromOperatorType } from '../../../Operators';
-import { useDiagramsContextSelector } from '../../../State/DiagramsProvider';
+import { getOperatorFromOperatorType } from '../../../../Operators';
+import { useDiagramsContextSelector } from '../../../../State/DiagramsProvider';
 
 export function LayerIndicator() {
   const layerName = useDiagramsContextSelector((ctx) => {

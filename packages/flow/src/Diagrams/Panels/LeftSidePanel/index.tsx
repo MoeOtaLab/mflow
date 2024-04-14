@@ -5,7 +5,6 @@ import {
   SnippetsOutlined
 } from '@ant-design/icons';
 import { OperatorPanel } from '../OperatorPanel';
-import { LayerPanel } from '../LayerPanel';
 import { CommandPanel } from '../CommandPanel';
 import { NavigationMenu } from './components/NavigationMenu';
 import css from './LeftSidePanel.module.less';
@@ -20,12 +19,6 @@ export function LeftSidePanel() {
             label: 'Operators',
             key: 'Operators',
             content: <OperatorPanel />
-          },
-          {
-            icon: <SnippetsOutlined rev="" />,
-            key: 'Layers',
-            label: 'Layers',
-            content: <LayerPanel />
           },
           {
             icon: <ApartmentOutlined rev="" />,

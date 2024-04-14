@@ -1,7 +1,14 @@
-import { useRef, useState, useEffect, forwardRef, useImperativeHandle, type ForwardedRef } from 'react';
+import {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  type ForwardedRef
+} from 'react';
 import classnames from 'classnames';
 import * as monaco from 'monaco-editor';
-import styles from './Editor.module.css';
+import styles from './Editor.module.less';
 import { useUpdateEffect } from 'ahooks';
 
 export interface IEditorRefType {
@@ -20,7 +27,8 @@ function _Editor(
 ) {
   const { code, className, readonly, language } = props;
 
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [editor, setEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef(null);
 
   useEffect(() => {
@@ -70,7 +78,9 @@ function _Editor(
     [editor]
   );
 
-  return <div className={classnames(styles.editor, className)} ref={monacoEl}></div>;
+  return (
+    <div className={classnames(styles.editor, className)} ref={monacoEl}></div>
+  );
 }
 
 export const Editor = forwardRef(_Editor);

@@ -29,7 +29,7 @@ import {
 import { nodeTypes } from '../../Nodes';
 import { isSameSourceHandle, isSameTargetHandle } from '../../utils';
 import css from './FlowDiagram.module.less';
-import { LayerIndicator } from '../LayerPanel/LayerIndicator';
+import { LayerIndicator } from './components/LayerIndicator';
 
 const nodeColor = (node: Node) => {
   const operator = getOperatorFromNode(node);
