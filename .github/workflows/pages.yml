@@ -6,7 +6,7 @@ name: Page Deploy
 on:
   # Triggers the workflow on push or pull request events but only for the main and dev branch
   push:
-    branches: [main, dev]
+    branches: [main, dev, 9-ui-layers]
   pull_request:
     branches: [main, dev]
 
