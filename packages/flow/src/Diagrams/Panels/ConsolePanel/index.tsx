@@ -11,8 +11,10 @@ export const ConsolePanel: React.FC = () => {
   const [height, setHeight] = useState(defaultHeight);
 
   useEffect(() => {
-    if (code) {
+    if (code && height <= defaultHeight) {
       setHeight(200);
+    } else if (!code && height === 200) {
+      setHeight(defaultHeight);
     }
   }, [code]);
 

@@ -58,6 +58,16 @@ export const DebugPanel: React.FC = () => {
       >
         Show Output
       </Button>
+      <Button
+        type="text"
+        onClick={() => {
+          setCacheData(cloneDeep({ layer }));
+          setOutput('');
+          setCode('');
+        }}
+      >
+        Clear
+      </Button>
       <Modal
         open={outputVisible}
         width={'100vw'}

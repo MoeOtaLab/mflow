@@ -25,7 +25,12 @@ export function useLinkRuntimeContext() {
 export function runCode(code: string) {
   const moduleData = { exports: undefined };
   // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval
-  const runLinkLogic = new Function('module', EosCoreSymbol, EosOperatorsSymbol, code);
+  const runLinkLogic = new Function(
+    'module',
+    EosCoreSymbol,
+    EosOperatorsSymbol,
+    code
+  );
   runLinkLogic(moduleData, EosCore, EosOperators);
   return moduleData;
 }
@@ -36,7 +41,9 @@ interface LinkRuntimeContextProviderProps {
   edges: Edge[];
 }
 
-export const LinkRuntimeContextProvider: React.FC<LinkRuntimeContextProviderProps> = (props) => {
+export const LinkRuntimeContextProvider: React.FC<
+  LinkRuntimeContextProviderProps
+> = (props) => {
   const { value, children, nodes, edges } = props;
   const [store, setStore] = useState<RuntimeContextState['store']>();
 
@@ -51,6 +58,7 @@ export const LinkRuntimeContextProvider: React.FC<LinkRuntimeContextProviderProp
 
   useEffect(() => {
     if (!value) {
+      setStore(undefined);
       return;
     }
 
@@ -64,5 +72,9 @@ export const LinkRuntimeContextProvider: React.FC<LinkRuntimeContextProviderProp
     }
   }, [value]);
 
-  return <RuntimeContext.Provider value={contextValue}>{children}</RuntimeContext.Provider>;
+  return (
+    <RuntimeContext.Provider value={contextValue}>
+      {children}
+    </RuntimeContext.Provider>
+  );
 };
