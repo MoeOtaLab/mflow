@@ -1,11 +1,13 @@
 import {
   ApartmentOutlined,
-  ControlOutlined,
   FunctionOutlined,
-  SnippetsOutlined
+  RocketOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { OperatorPanel } from '../OperatorPanel';
 import { CommandPanel } from '../CommandPanel';
+import { DebugPanel } from '../ConsolePanel/DebugPanel';
+
 import { NavigationMenu } from './components/NavigationMenu';
 import css from './LeftSidePanel.module.less';
 
@@ -15,21 +17,27 @@ export function LeftSidePanel() {
       <NavigationMenu
         items={[
           {
-            icon: <FunctionOutlined rev="" />,
+            icon: <FunctionOutlined />,
             label: 'Operators',
             key: 'Operators',
             content: <OperatorPanel />
           },
           {
-            icon: <ApartmentOutlined rev="" />,
+            icon: <ApartmentOutlined />,
             key: 'UI',
             label: 'UI',
             content: <div>coming soon</div>
           },
           {
-            icon: <ControlOutlined rev="" />,
-            key: 'commands',
-            label: 'commands',
+            icon: <RocketOutlined />,
+            key: 'Debug',
+            label: 'Debug',
+            content: <DebugPanel />
+          },
+          {
+            icon: <SettingOutlined />,
+            key: 'Commands',
+            label: 'Commands',
             content: <CommandPanel />
           }
         ]}

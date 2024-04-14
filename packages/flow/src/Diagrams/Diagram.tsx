@@ -6,6 +6,7 @@ import { LeftSidePanel } from './Panels/LeftSidePanel';
 import { FlowDiagram } from './Panels/FlowDiagram';
 import { AttributePanel } from './Panels/AttributePanel';
 import { ConsolePanel } from './Panels/ConsolePanel';
+import { ConsolePanelContextProvider } from './Panels/ConsolePanel/ConsolePanelContext';
 import { UIEditorPanel } from './Panels/UIEditorPanel';
 import css from './Diagram.module.less';
 
@@ -42,21 +43,25 @@ export const Diagram: React.FC = () => {
       </div>
       <OperatorProvider>
         <DiagramsContextProvider>
-          {currentPanel === PanelEnum.Model && (
-            <div key={currentPanel} className={css.container}>
-              <LeftSidePanel />
-              <FlowDiagram />
-              <AttributePanel />
-              <div className={css.console}>
-                <ConsolePanel />
+          <ConsolePanelContextProvider>
+            {currentPanel === PanelEnum.Model && (
+              <div key={currentPanel} className={css.container}>
+                <LeftSidePanel />
+                <div className={css['diagram-container']}>
+                  <FlowDiagram />
+                  <AttributePanel />
+                  <div className={css.console}>
+                    <ConsolePanel />
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-          {currentPanel === PanelEnum.UI && (
-            <div key={currentPanel}>
-              <UIEditorPanel />
-            </div>
-          )}
+            )}
+            {currentPanel === PanelEnum.UI && (
+              <div key={currentPanel}>
+                <UIEditorPanel />
+              </div>
+            )}
+          </ConsolePanelContextProvider>
         </DiagramsContextProvider>
       </OperatorProvider>
     </div>

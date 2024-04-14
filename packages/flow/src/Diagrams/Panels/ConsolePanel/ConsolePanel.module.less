@@ -1,0 +1,23 @@
+.demo-container {
+  position: relative;
+}
+
+.resize-bar {
+  height: 4px;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+
+  cursor: row-resize;
+  user-select: none;
+  background-color: transparent;
+
+  transition: background-color cubic-bezier(0.215, 0.61, 0.355, 1) 0.25;
+
+  &:hover {
+    background-color: #2f81f7;
+  }
+}

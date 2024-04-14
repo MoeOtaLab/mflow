@@ -1,85 +1,60 @@
-import React, { useState } from 'react';
-import { useDiagramsState } from '../../State/DiagramsProvider';
-import { Complier, NodeGraph } from '../../Compiler';
+import React, { useEffect, useRef, useState } from 'react';
 import { LinkRuntimeContextProvider } from '../../Compiler/runtime';
 import { Demo } from './Demo';
-import { Button, Modal } from 'antd';
-import { cloneDeep } from 'lodash';
-import { type Layer } from '../../State/Layer';
-import { Editor } from '../../components/Editor';
-import css from './Editor.module.less';
+import { useConsolePanelContext } from './ConsolePanelContext';
+import css from './ConsolePanel.module.less';
 
 export const ConsolePanel: React.FC = () => {
-  const { layer } = useDiagramsState();
-  const [output, setOutput] = useState('');
-  const [code, setCode] = useState('');
-  const [cacheData, setCacheData] = useState<{
-    layer: Layer;
-  }>({
-    layer
-  });
+  const { code, cacheData } = useConsolePanelContext();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const defaultHeight = 8;
+  const [height, setHeight] = useState(defaultHeight);
 
-  const [outputVisible, setOutputVisible] = useState(false);
+  useEffect(() => {
+    if (code) {
+      setHeight(200);
+    }
+  }, [code]);
 
   return (
     <div>
       <div>Console</div>
-      <br />
       <div
-        style={{
-          display: 'grid',
-          gap: 16,
-          gridAutoFlow: 'column',
-          justifyContent: 'start'
-        }}
+        style={height === undefined ? {} : { height }}
+        className={css['demo-container']}
+        ref={containerRef}
       >
-        <Button
-          type="link"
-          onClick={() => {
-            console.log(new NodeGraph(layer.nodes, layer.edges));
-            console.log({
-              layer
-            });
-          }}
-        >
-          Console Graph
-        </Button>
+        <div
+          className={css['resize-bar']}
+          onMouseDown={(event) => {
+            const initMouseOffset = event.clientY;
+            const initialHeight =
+              containerRef.current!.getBoundingClientRect().height;
+            function handleMouseMove(event: MouseEvent) {
+              const currentMouseY = event.clientY;
+              const offset = initMouseOffset - currentMouseY;
+              const targetHeight = offset + initialHeight;
+              const throltte = 8;
+              setHeight(
+                Math.min(
+                  window.innerHeight * 0.8,
+                  Math.max(targetHeight, throltte)
+                )
+              );
+              if (targetHeight < throltte) {
+                setHeight(0);
+              }
+            }
 
-        <Button
-          type="link"
-          onClick={() => {
-            const complier = new Complier();
-            setOutput(complier.complie({ layer }));
-          }}
-        >
-          Compile
-        </Button>
+            function handleMouseUp() {
+              document.removeEventListener('mousemove', handleMouseMove);
+              document.removeEventListener('mouseup', handleMouseUp);
+            }
 
-        <Button
-          type="link"
-          onClick={() => {
-            const complier = new Complier();
-            const code = complier.complie({ layer });
-            setCacheData(cloneDeep({ layer }));
-            setOutput(code);
-            setCode(code);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
           }}
-        >
-          Compile and Run
-        </Button>
-
-        <Button
-          type="link"
-          disabled={!output}
-          onClick={() => {
-            setOutputVisible(true);
-          }}
-        >
-          Show Output
-        </Button>
-      </div>
-
-      <div>
+        ></div>
         <br />
         <LinkRuntimeContextProvider
           value={code}
@@ -89,25 +64,6 @@ export const ConsolePanel: React.FC = () => {
           <Demo />
         </LinkRuntimeContextProvider>
       </div>
-
-      <Modal
-        open={outputVisible}
-        width={'100vw'}
-        style={{ top: 0 }}
-        onOk={() => {
-          setOutputVisible(false);
-        }}
-        onCancel={() => {
-          setOutputVisible(false);
-        }}
-      >
-        <Editor
-          language="typescript"
-          readonly={true}
-          className={css.editor}
-          code={output}
-        />
-      </Modal>
     </div>
   );
 };
