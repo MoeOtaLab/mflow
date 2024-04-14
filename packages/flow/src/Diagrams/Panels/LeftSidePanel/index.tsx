@@ -7,6 +7,7 @@ import {
 import { OperatorPanel } from '../OperatorPanel';
 import { CommandPanel } from '../CommandPanel';
 import { DebugPanel } from '../ConsolePanel/DebugPanel';
+import { UIPanel } from '../UIPanel';
 
 import { NavigationMenu } from './components/NavigationMenu';
 import css from './LeftSidePanel.module.less';
@@ -26,7 +27,7 @@ export function LeftSidePanel() {
             icon: <ApartmentOutlined />,
             key: 'UI',
             label: 'UI',
-            content: <div>coming soon</div>
+            content: <UIPanel />
           },
           {
             icon: <RocketOutlined />,

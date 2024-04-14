@@ -155,7 +155,7 @@ export function FileItem(props: {
         ) : null}
         <div className={classnames(css['icon'])}>
           {treeData.isLeaf ? (
-            <FunctionOutlined />
+            treeData?.icon || <FunctionOutlined />
           ) : isExpanded ? (
             <FolderOpenOutlined />
           ) : (

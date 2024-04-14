@@ -5,6 +5,7 @@ export type ITreeDataNode = {
   key: string;
   isLeaf?: boolean;
   draggable?: boolean;
+  icon?: React.ReactNode;
   children?: ITreeDataNode[];
 };
 
