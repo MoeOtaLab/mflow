@@ -9,6 +9,13 @@ import {
   removeOperators
 } from '../../Operators/OperatorMap';
 import { Modal, message } from 'antd';
+import {
+  useDiagramsState,
+  useDiagramsActions,
+  useDiagramsHookOption
+} from '../../State/DiagramsProvider';
+import { Layer } from '../../State/Layer';
+import { flushSync } from 'react-dom';
 
 export const OPERATOR_TYPE_DATA = 'operator_type';
 
@@ -22,6 +29,55 @@ export const OperatorPanel: React.FC = () => {
   };
 
   const { operators, refreshOperators } = useOperators();
+  const { actionsRef, currentStateRef } = useDiagramsHookOption();
+
+  const { layer, defaultLayer } = useDiagramsState();
+  const { setLayer, setActiveLayerId, setDefaultLayer } = useDiagramsActions();
+
+  function resetLayer() {
+    if (layer.id === defaultLayer.id) {
+      return;
+    }
+
+    flushSync(() => {
+      setLayer(defaultLayer);
+      setActiveLayerId(defaultLayer.id);
+    });
+
+    setTimeout(() => {
+      operators.forEach((operator) => {
+        operator.onLayerChange?.({
+          currentState: currentStateRef.current,
+          actions: actionsRef.current
+        });
+      });
+    });
+  }
+
+  function setActiveLayer(targetLayer: Layer) {
+    if (layer.id === targetLayer.id) {
+      return;
+    }
+
+    if (layer.id === defaultLayer.id) {
+      setDefaultLayer(layer);
+    }
+
+    flushSync(() => {
+      setLayer(targetLayer);
+      setActiveLayerId(targetLayer.id);
+    });
+
+    setTimeout(() => {
+      operators.forEach((operator) => {
+        operator.onLayerChange?.({
+          currentState: currentStateRef.current,
+          actions: actionsRef.current
+        });
+      });
+    });
+  }
+
   const defaultOperators = operators.filter((item) => !item.isCustom);
   const customOperators = operators.filter((item) => item.isCustom);
 
@@ -53,6 +109,11 @@ export const OperatorPanel: React.FC = () => {
               key: item.operatorType,
               isLeaf: true
             }))
+          },
+          {
+            title: 'App',
+            key: 'App',
+            isLeaf: true
           }
         ]}
         getNewFile={() => {
@@ -87,6 +148,21 @@ export const OperatorPanel: React.FC = () => {
           }
 
           return undefined;
+        }}
+        activeKey={layer.relativeOperatorType || 'App'}
+        onActiveKeyChange={(activeKey) => {
+          if (!activeKey) {
+            resetLayer();
+            return;
+          }
+          const operator =
+            getOperatorFromOperatorType<CustomOperator>(activeKey);
+          if (!operator || !operator.isCustom) {
+            resetLayer();
+            return;
+          }
+
+          setActiveLayer(operator.content.layer);
         }}
       />
     </div>

@@ -178,6 +178,7 @@ export function FileItem(props: {
                   ...treeData,
                   title: event.target.value
                 });
+                setEditingKey(undefined);
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
@@ -187,6 +188,7 @@ export function FileItem(props: {
                     title: event.target.value
                   });
                   event.stopPropagation();
+                  setEditingKey(undefined);
                 }
               }}
             />

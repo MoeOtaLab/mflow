@@ -18,12 +18,18 @@ import ReactFlow, {
   Panel
 } from 'reactflow';
 import { OPERATOR_TYPE_DATA } from '../OperatorPanel';
-import { getOperatorFromNode, getOperatorFromOperatorType } from '../../Operators';
-import { useDiagramsContext, useDiagramsHookOption } from '../../State/DiagramsProvider';
+import {
+  getOperatorFromNode,
+  getOperatorFromOperatorType
+} from '../../Operators';
+import {
+  useDiagramsContext,
+  useDiagramsHookOption
+} from '../../State/DiagramsProvider';
 import { nodeTypes } from '../../Nodes';
 import { isSameSourceHandle, isSameTargetHandle } from '../../utils';
 import css from './FlowDiagram.module.less';
-import { BackToLayer } from '../LayerPanel/BackToLayer';
+import { LayerIndicator } from '../LayerPanel/LayerIndicator';
 
 const nodeColor = (node: Node) => {
   const operator = getOperatorFromNode(node);
@@ -68,7 +74,10 @@ export const FlowDiagram: React.FC = () => {
     setEdges((eds) =>
       addEdge(connection, eds).filter((item) => {
         if (isEdge(item)) {
-          if (!isSameSourceHandle(item, connection) && isSameTargetHandle(item, connection)) {
+          if (
+            !isSameSourceHandle(item, connection) &&
+            isSameTargetHandle(item, connection)
+          ) {
             return false;
           }
         }
@@ -83,11 +92,17 @@ export const FlowDiagram: React.FC = () => {
           isEdge(el) &&
           el.source === edge.source &&
           el.target === edge.target &&
-          (el.sourceHandle === edge.sourceHandle || (!el.sourceHandle && !edge.sourceHandle)) &&
-          (el.targetHandle === edge.targetHandle || (!el.targetHandle && !edge.targetHandle))
+          (el.sourceHandle === edge.sourceHandle ||
+            (!el.sourceHandle && !edge.sourceHandle)) &&
+          (el.targetHandle === edge.targetHandle ||
+            (!el.targetHandle && !edge.targetHandle))
         );
       });
-      addSelectedEdges([targetEdge].filter((item): item is Edge => Boolean(item)).map((item) => item.id));
+      addSelectedEdges(
+        [targetEdge]
+          .filter((item): item is Edge => Boolean(item))
+          .map((item) => item.id)
+      );
     });
   };
 
@@ -108,7 +123,10 @@ export const FlowDiagram: React.FC = () => {
         const operatorInstance = operator.create();
         if (operator.isUnique) {
           if (
-            nodes.find((item: typeof operatorInstance) => item.data?.operatorType === operator.operatorType)
+            nodes.find(
+              (item: typeof operatorInstance) =>
+                item.data?.operatorType === operator.operatorType
+            )
           ) {
             message.warning(`只允许存在一个${operator.operatorName}`);
             return;
@@ -125,7 +143,9 @@ export const FlowDiagram: React.FC = () => {
 
         setNodes((eles) => [...eles, operatorInstance]);
         setTimeout(() => {
-          const node = nodesRef.current.find((item) => item.id === operatorInstance.id);
+          const node = nodesRef.current.find(
+            (item) => item.id === operatorInstance.id
+          );
 
           if (node) {
             const pos = {
@@ -196,11 +216,16 @@ export const FlowDiagram: React.FC = () => {
         zoomOnScroll={false}
         defaultEdgeOptions={{ animated: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={24} color="rgba(255,255,255,0.4)" size={2} />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={24}
+          color="rgba(255,255,255,0.4)"
+          size={2}
+        />
         <MiniMap nodeColor={nodeColor} nodeStrokeWidth={3} zoomable pannable />
         <Controls />
         <Panel position="top-left">
-          <BackToLayer />
+          <LayerIndicator />
         </Panel>
         <Panel position="top-right">
           <Button

@@ -167,14 +167,12 @@ export function FileManager(props: IFileManagerProps) {
     if (fileData?.key === pendingAddItem?.key) {
       if (!fileData.title) {
         setPendingAddItem(undefined);
-        setEditingKey(undefined);
       } else {
         const targetFile =
           onFileChange?.(fileData, FileChangeEnum.Add) || fileData;
         setPendingAddItem(undefined);
         setActiveKey(targetFile?.key);
         setFocusKey(targetFile?.key);
-        setEditingKey(undefined);
       }
     }
   });
