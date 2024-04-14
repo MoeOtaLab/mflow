@@ -24,9 +24,17 @@ export function FileItem(props: {
     FileManagerContext,
     (ctx) => ctx.setActiveKey
   );
+  const setFocusKey = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.setFocusKey
+  );
   const isActive = useContextSelector(
     FileManagerContext,
     (ctx) => ctx.activeKey === treeData.key
+  );
+  const isFocus = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.focusKey === treeData.key
   );
   const isExpanded = useContextSelector(FileManagerContext, (ctx) =>
     ctx.expandedKeys?.includes(treeData.key)
@@ -70,11 +78,14 @@ export function FileItem(props: {
         }}
         className={classnames(css['file-item'], {
           [css.selected]: isActive,
+          [css.focus]: isFocus,
           [css['dragging-start']]: draggingStart
         })}
         onClick={() => {
-          setActiveKey(treeData?.key);
-          if (!treeData.isLeaf) {
+          setFocusKey(treeData?.key);
+          if (treeData.isLeaf) {
+            setActiveKey(treeData?.key);
+          } else {
             // directory
             setExpandedKeys((keys) => {
               const keySet = new Set(keys);
@@ -106,6 +117,9 @@ export function FileItem(props: {
             <RightOutlined />
           </div>
         )}
+        {treeData.isLeaf ? (
+          <div className={css['expand-icon-placeholder']}></div>
+        ) : null}
         <div className={classnames(css['icon'])}>
           {treeData.isLeaf ? (
             <FunctionOutlined />

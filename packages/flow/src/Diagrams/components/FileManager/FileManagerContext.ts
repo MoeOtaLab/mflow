@@ -18,6 +18,10 @@ export type IFileManagerContext = {
   setActiveKey: React.Dispatch<
     React.SetStateAction<ITreeDataNode['key'] | undefined>
   >;
+  focusKey?: ITreeDataNode['key'];
+  setFocusKey: React.Dispatch<
+    React.SetStateAction<ITreeDataNode['key'] | undefined>
+  >;
   rootTreeData: IHandledTreeDataNode[];
   highlightKey?: ITreeDataNode['key'];
   onDragStart?: (
@@ -30,6 +34,8 @@ export const FileManagerContext = createContext<IFileManagerContext>({
   expandedKeys: [],
   setExpandedKeys: () => {},
   activeKey: '',
+  focusKey: '',
+  setFocusKey: () => {},
   highlightKey: '',
   setActiveKey: () => {},
   rootTreeData: []

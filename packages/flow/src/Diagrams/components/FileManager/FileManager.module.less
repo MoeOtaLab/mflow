@@ -1,9 +1,19 @@
 .container {
+  color: rgb(45, 45, 45);
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
 }
 
 .file-tree-container {
   display: flex;
   flex-flow: column;
+  flex: 1 1 auto;
+  border: 1px solid transparent;
+
+  &.focus {
+    border: 1px solid rgba(22, 119, 255, 0.745);
+  }
 }
 
 @fileItemRowGap: 2px;
@@ -46,11 +56,12 @@
   user-select: none;
 
   &:hover,
-  &.selected {
-    background-color: rgba(0, 0, 0, 0.04);
+  &.selected,
+  &.focus {
+    background-color: rgba(0, 0, 0, 0.09);
   }
 
-  &.selected {
+  &.focus {
     border: 1px solid rgba(22, 119, 255, 0.745);
   }
 
@@ -70,6 +81,10 @@
   &.expanded {
     transform: rotate(90deg);
   }
+}
+
+.expand-icon-placeholder {
+  width: 12px;
 }
 
 .icon {

@@ -1,5 +1,6 @@
 import css from './FileManager.module.less';
-import { useMemo } from 'react';
+import classnames from 'classnames';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   FileManagerContext,
   IFileManagerContext,
@@ -23,6 +24,8 @@ type IFileManagerProps = {
   defaultActiveKey?: IFileManagerContext['activeKey'];
   activeKey?: IFileManagerContext['activeKey'];
   onActiveKeyChange?: (activeKey: IFileManagerContext['activeKey']) => void;
+  focusKey?: IFileManagerContext['focusKey'];
+  onFocusKeyChange?: (focusKey: IFileManagerContext['focusKey']) => void;
   defaultExpandedKeys?: IFileManagerContext['expandedKeys'];
   expandedKeys?: IFileManagerContext['expandedKeys'];
   onExpandedKeysChange?: (
@@ -31,6 +34,8 @@ type IFileManagerProps = {
   onDragStart?: IFileManagerContext['onDragStart'];
   onAddFile?: (activeTreeNode?: ITreeDataNode) => void;
 };
+
+const ROOT_FOCUS_KEY = '__ROOT_FOCUS_KEY__';
 
 function convertTreeData(
   treeData: ITreeDataNode,
@@ -86,6 +91,15 @@ export function FileManager(props: IFileManagerProps) {
     trigger: 'onActiveKeyChange'
   });
 
+  const [focusKey, setFocusKey] = useControllableValue<
+    IFileManagerContext['focusKey']
+  >(props, {
+    defaultValue: undefined,
+    defaultValuePropName: 'defaultFocusKey',
+    valuePropName: 'focusKey',
+    trigger: 'onFocusKeyChange'
+  });
+
   const [expandedKeys, setExpandedKeys] = useControllableValue<
     IFileManagerContext['expandedKeys']
   >(props, {
@@ -99,23 +113,46 @@ export function FileManager(props: IFileManagerProps) {
     return treeData?.map((item) => convertTreeData(item));
   }, [treeData]);
 
-  const activeTreeNode = useMemo(() => {
+  const activeOrFocusKey = focusKey || activeKey;
+
+  const activeOrFocusTreeNode = useMemo(() => {
     return findTargetTreeNode(
       rootTreeData,
-      (treeNode) => treeNode.key === activeKey
+      (treeNode) => treeNode.key === activeOrFocusKey
     );
-  }, [activeKey, rootTreeData]);
+  }, [activeOrFocusKey, rootTreeData]);
 
   const highlightKey = useMemo(() => {
-    if (activeKey && expandedKeys.includes(activeKey)) {
-      return activeKey;
+    if (activeOrFocusKey && expandedKeys.includes(activeOrFocusKey)) {
+      return activeOrFocusKey;
     }
 
-    return activeTreeNode?.parent?.key;
-  }, [activeKey, activeTreeNode, expandedKeys]);
+    return activeOrFocusTreeNode?.parent?.key;
+  }, [activeKey, activeOrFocusTreeNode, expandedKeys]);
+
+  const treeContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(event: MouseEvent) {
+      if (
+        // @ts-expect-error
+        (event.target && treeContainerRef?.current?.contains(event.target)) ||
+        event.target === treeContainerRef?.current
+      ) {
+        return;
+      }
+
+      setFocusKey(undefined);
+    }
+
+    document.addEventListener('click', handleClick, false);
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   return (
-    <div>
+    <div className={css.container}>
       <div className={css['action-container']}>
         <Tooltip
           placement="bottom"
@@ -127,11 +164,16 @@ export function FileManager(props: IFileManagerProps) {
           <div
             className={css['action-icon']}
             onClick={() => {
-              activeTreeNode;
+              let targetActiveNode = activeOrFocusTreeNode;
+              if (
+                activeOrFocusTreeNode?.isLeaf ||
+                (!activeOrFocusTreeNode?.isLeaf &&
+                  !expandedKeys.includes(targetActiveNode?.key || ''))
+              ) {
+                targetActiveNode = activeOrFocusTreeNode?.parent;
+              }
 
-              onAddFile?.(
-                activeTreeNode?.isLeaf ? activeTreeNode.parent : activeTreeNode
-              );
+              onAddFile?.(targetActiveNode);
             }}
           >
             <FileAddOutlined />
@@ -193,7 +235,17 @@ export function FileManager(props: IFileManagerProps) {
           </div>
         </Tooltip>
       </div>
-      <div className={css['file-tree-container']}>
+      <div
+        ref={treeContainerRef}
+        className={classnames(css['file-tree-container'], {
+          [css.focus]: focusKey === ROOT_FOCUS_KEY
+        })}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            setFocusKey(ROOT_FOCUS_KEY);
+          }
+        }}
+      >
         <FileManagerContext.Provider
           value={{
             expandedKeys,
@@ -202,7 +254,9 @@ export function FileManager(props: IFileManagerProps) {
             setActiveKey,
             rootTreeData,
             highlightKey,
-            onDragStart
+            onDragStart,
+            focusKey,
+            setFocusKey
           }}
         >
           {rootTreeData?.map((item) => <FileItem indent={0} treeData={item} />)}
