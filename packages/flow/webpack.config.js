@@ -57,9 +57,7 @@ const config = {
             options: {
               modules: {
                 auto: /\.module\.less$/,
-                localIdentName: isProduction
-                  ? undefined
-                  : '[name]__[local]--[hash:base64:5]'
+                localIdentName: '[name]__[local]--[hash:base64:5]'
               }
             }
           },
