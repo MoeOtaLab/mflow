@@ -123,8 +123,8 @@ export const OperatorPanel: React.FC = () => {
             }))
           },
           {
-            title: 'App',
-            key: 'App',
+            title: 'Untitled',
+            key: 'Untitled',
             isLeaf: true,
             draggable: false
           }
@@ -163,7 +163,7 @@ export const OperatorPanel: React.FC = () => {
 
           return undefined;
         }}
-        activeKey={layer.relativeOperatorType || 'App'}
+        activeKey={layer.relativeOperatorType || 'Untitled'}
         onActiveKeyChange={(activeKey) => {
           if (!activeKey) {
             resetLayer();

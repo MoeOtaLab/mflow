@@ -3,9 +3,17 @@ import { type IGenerationOption } from '../../Compiler';
 import { NodeTypeEnum } from '../../Nodes/NodeTypeEnum';
 import { Layer } from '../../State/Layer';
 import { MetaOperator } from '../MetaOperator';
-import { type IHookOption, type ICustomOperatorData, type IAppContainersInfo } from '../types';
+import {
+  type IHookOption,
+  type ICustomOperatorData,
+  type IAppContainersInfo
+} from '../types';
 import { v4 as uuid } from 'uuid';
-import { getNodeEndPointFromLayer, getInputPorts, getOutputPorts } from '../GroupOperator/utils';
+import {
+  getNodeEndPointFromLayer,
+  getInputPorts,
+  getOutputPorts
+} from '../GroupOperator/utils';
 import { getRandomId } from '../../utils';
 import { EosCoreSymbol } from '../../Compiler/runtime';
 
@@ -41,6 +49,12 @@ export class CustomOperator
     this.content = content;
   }
 
+  replaceContent(content: { layer: Layer }) {
+    this.content = content;
+    this.content.layer.relativeOperatorType = this.operatorType;
+    this.content.layer.name = this.operatorName;
+  }
+
   create(): Node<ICustomOperatorData<Record<string, any>>> {
     const id = getRandomId();
     const { endPointList } = getNodeEndPointFromLayer(this.content.layer, id);
@@ -57,13 +71,15 @@ export class CustomOperator
     return node;
   }
 
-  generateBlockDeclarations(options: IGenerationOption<ICustomOperatorData>): string[] {
+  generateBlockDeclarations(
+    options: IGenerationOption<ICustomOperatorData>
+  ): string[] {
     const { node, nodeGraph, formatVariableName, formatBlockVarName } = options;
 
     return [
-      `const temp_${formatVariableName(node.id)} = context.mount(${formatBlockVarName(
-        this.getOperatorId()
-      )}, {
+      `const temp_${formatVariableName(
+        node.id
+      )} = context.mount(${formatBlockVarName(this.getOperatorId())}, {
         ${getInputPorts(node)
           .map((port) => {
             const sourceId = nodeGraph
@@ -74,28 +90,38 @@ export class CustomOperator
               return '';
             }
 
-            return `['${port.variableName}']: ${formatVariableName(sourceId || '')}`;
+            return `['${port.variableName}']: ${formatVariableName(
+              sourceId || ''
+            )}`;
           })
           .filter(Boolean)
           .join(',\n')}
       })`,
       ...(getOutputPorts(node) || [])?.map((port) => {
-        return `const ${formatVariableName(port.id)} = new ${EosCoreSymbol}.ModelProxy()`;
+        return `const ${formatVariableName(
+          port.id
+        )} = new ${EosCoreSymbol}.ModelProxy()`;
       })
     ];
   }
 
-  generateBlockOutput(options: IGenerationOption<ICustomOperatorData<Record<string, any>>>): string[] {
+  generateBlockOutput(
+    options: IGenerationOption<ICustomOperatorData<Record<string, any>>>
+  ): string[] {
     return [];
   }
 
-  generateBlockRelation(options: IGenerationOption<ICustomOperatorData<Record<string, any>>>): string[] {
+  generateBlockRelation(
+    options: IGenerationOption<ICustomOperatorData<Record<string, any>>>
+  ): string[] {
     const { node, formatVariableName } = options;
     return [
       `temp_${formatVariableName(node.id)}.on('postInit', () => {
         ${[
           ...(getOutputPorts(node) || [])?.map((port) => {
-            return `${formatVariableName(port.id)}.proxy(temp_${formatVariableName(node.id)}.output['${
+            return `${formatVariableName(
+              port.id
+            )}.proxy(temp_${formatVariableName(node.id)}.output['${
               port.variableName
             }'])`;
           })
@@ -126,20 +152,33 @@ export class CustomOperator
   refreshNode(options: IHookOption<Node<ICustomOperatorData>>) {
     const { node, currentState } = options;
 
-    const { endPointList } = getNodeEndPointFromLayer(this.content.layer, node.id);
+    const { endPointList } = getNodeEndPointFromLayer(
+      this.content.layer,
+      node.id
+    );
 
     if (endPointList) {
-      options.actions.updateNode(node.id, (v) => this.updateData(v, { endPointOptions: { endPointList } }), {
-        updateInternal: true,
-        layerId: currentState.layer?.id
-      });
+      options.actions.updateNode(
+        node.id,
+        (v) => this.updateData(v, { endPointOptions: { endPointList } }),
+        {
+          updateInternal: true,
+          layerId: currentState.layer?.id
+        }
+      );
     }
   }
 
-  onLayerChange(options: Omit<IHookOption<Node<ICustomOperatorData<Record<string, any>>>>, 'node'>): void {
+  onLayerChange(
+    options: Omit<
+      IHookOption<Node<ICustomOperatorData<Record<string, any>>>>,
+      'node'
+    >
+  ): void {
     const { currentState } = options;
     const currentNodes = currentState.layer.nodes?.filter(
-      (item: Node<ICustomOperatorData>) => item.data?.operatorType === this.operatorType
+      (item: Node<ICustomOperatorData>) =>
+        item.data?.operatorType === this.operatorType
     );
 
     currentNodes?.forEach((node) => {
