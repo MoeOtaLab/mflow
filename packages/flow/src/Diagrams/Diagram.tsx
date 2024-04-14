@@ -18,7 +18,9 @@ enum PanelEnum {
 const url = new URL(window.location.href);
 
 export const Diagram: React.FC = () => {
-  const [currentPanel, setPanel] = useState(url.searchParams.get('panel') || PanelEnum.Model);
+  const [currentPanel, setPanel] = useState(
+    url.searchParams.get('panel') || PanelEnum.Model
+  );
 
   return (
     <div>
@@ -33,7 +35,7 @@ export const Diagram: React.FC = () => {
             window.history.pushState('', '', url.href);
           }}
           defaultValue="Model"
-          buttonStyle="solid"
+          size="small"
         >
           <Radio.Button value={PanelEnum.Model}>Model</Radio.Button>
           <Radio.Button value={PanelEnum.Binding}>Binding</Radio.Button>

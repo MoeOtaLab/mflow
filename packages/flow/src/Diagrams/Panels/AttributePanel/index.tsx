@@ -1,12 +1,16 @@
 import React from 'react';
-import { useDiagramsContextSelector, useDiagramsActions } from '../../State/DiagramsProvider';
+import {
+  useDiagramsContextSelector,
+  useDiagramsActions
+} from '../../State/DiagramsProvider';
 import { getOperatorFromNode } from '../../Operators';
 
 export const AttributePanel: React.FC = () => {
   const nodes = useDiagramsContextSelector((ctx) => ctx.nodes);
   const selectedElements = nodes.filter((item) => item.selected);
 
-  const selectedElement = selectedElements?.length === 1 ? selectedElements[0] : undefined;
+  const selectedElement =
+    selectedElements?.length === 1 ? selectedElements[0] : undefined;
 
   const selectedElementNode = useDiagramsContextSelector((ctx) =>
     ctx.nodes.find((item) => item.id === selectedElement?.id)
@@ -18,8 +22,12 @@ export const AttributePanel: React.FC = () => {
 
   const { updateEdge, updateNode, setLayer } = useDiagramsActions();
 
+  if (!selectedElement) {
+    return null;
+  }
+
   return (
-    <div>
+    <div style={{ width: 150 }}>
       <div>Attributes</div>
       {showConfig &&
         operator?.generateAttributeControl?.({
