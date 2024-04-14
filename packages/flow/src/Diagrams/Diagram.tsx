@@ -8,6 +8,7 @@ import { AttributePanel } from './Panels/AttributePanel';
 import { ConsolePanel } from './Panels/ConsolePanel';
 import { ConsolePanelContextProvider } from './Panels/ConsolePanel/ConsolePanelContext';
 import { UIEditorPanel } from './Panels/UIEditorPanel';
+import { UIEditorContextProvider } from './Panels/UIEditorPanel/UIEditorContext';
 import css from './Diagram.module.less';
 
 enum PanelEnum {
@@ -41,29 +42,31 @@ export const Diagram: React.FC = () => {
           <Radio.Button value={PanelEnum.UI}>UI</Radio.Button>
         </Radio.Group>
       </div>
-      <OperatorProvider>
-        <DiagramsContextProvider>
-          <ConsolePanelContextProvider>
-            {currentPanel === PanelEnum.Model && (
-              <div key={currentPanel} className={css.container}>
-                <LeftSidePanel />
-                <div className={css['diagram-container']}>
-                  <FlowDiagram />
-                  <AttributePanel />
-                  <div className={css.console}>
-                    <ConsolePanel />
+      <UIEditorContextProvider>
+        <OperatorProvider>
+          <DiagramsContextProvider>
+            <ConsolePanelContextProvider>
+              {currentPanel === PanelEnum.Model && (
+                <div key={currentPanel} className={css.container}>
+                  <LeftSidePanel />
+                  <div className={css['diagram-container']}>
+                    <FlowDiagram />
+                    <AttributePanel />
+                    <div className={css.console}>
+                      <ConsolePanel />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {currentPanel === PanelEnum.UI && (
-              <div key={currentPanel}>
-                <UIEditorPanel />
-              </div>
-            )}
-          </ConsolePanelContextProvider>
-        </DiagramsContextProvider>
-      </OperatorProvider>
+              )}
+              {currentPanel === PanelEnum.UI && (
+                <div key={currentPanel}>
+                  <UIEditorPanel />
+                </div>
+              )}
+            </ConsolePanelContextProvider>
+          </DiagramsContextProvider>
+        </OperatorProvider>
+      </UIEditorContextProvider>
     </div>
   );
 };

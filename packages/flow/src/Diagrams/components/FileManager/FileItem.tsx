@@ -36,8 +36,9 @@ export function FileItem(props: {
     FileManagerContext,
     (ctx) => ctx.focusKey === treeData.key
   );
-  const isExpanded = useContextSelector(FileManagerContext, (ctx) =>
-    ctx.expandedKeys?.includes(treeData.key)
+  const isExpanded = useContextSelector(
+    FileManagerContext,
+    (ctx) => ctx.expandedKeys?.includes(treeData.key) || ctx.expandAll
   );
 
   const onDragStart = useContextSelector(

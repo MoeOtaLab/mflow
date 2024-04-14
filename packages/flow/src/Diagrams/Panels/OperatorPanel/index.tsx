@@ -3,7 +3,11 @@ import { useOperators } from '../../State/OperatorProvider';
 import { CustomOperator } from '../../Operators/CustomOperator';
 import { registerOperators } from '../../Operators';
 import css from './OperatorPanel.module.less';
-import { FileChangeEnum, FileManager } from '../../components/FileManager';
+import {
+  ActionButtonEnum,
+  FileChangeEnum,
+  FileManager
+} from '../../components/FileManager';
 import {
   getOperatorFromOperatorType,
   removeOperators
@@ -174,6 +178,11 @@ export const OperatorPanel: React.FC = () => {
 
           setActiveLayer(operator.content.layer);
         }}
+        showButtonList={[
+          ActionButtonEnum.AddFile,
+          ActionButtonEnum.Collapse,
+          ActionButtonEnum.Reveal
+        ]}
       />
     </div>
   );

@@ -35,8 +35,8 @@ export type IFileManagerContext = {
     event: React.DragEvent<Element>,
     treeNode: IHandledTreeDataNode
   ) => void;
-
   handleFileChange?: (file: IHandledTreeDataNode) => void;
+  expandAll?: boolean;
 };
 
 export const FileManagerContext = createContext<IFileManagerContext>({
@@ -51,5 +51,6 @@ export const FileManagerContext = createContext<IFileManagerContext>({
   pendingAddItem: undefined,
   setEditingKey: () => {},
   rootTreeData: [],
-  handleFileChange: () => {}
+  handleFileChange: () => {},
+  expandAll: false
 });

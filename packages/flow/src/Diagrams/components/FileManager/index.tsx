@@ -12,6 +12,7 @@ import {
   AimOutlined,
   FileAddOutlined,
   FolderAddOutlined,
+  ReloadOutlined,
   SwitcherOutlined
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
@@ -20,6 +21,14 @@ import { useControllableValue, useLatest, useMemoizedFn } from 'ahooks';
 export enum FileChangeEnum {
   Add = 'Add',
   Delete = 'Delete'
+}
+
+export enum ActionButtonEnum {
+  AddFile = 'AddFile',
+  AddDirectory = 'AddDirectory',
+  Refresh = 'Refresh',
+  Collapse = 'Collapse',
+  Reveal = 'Reveal'
 }
 
 type IFileManagerProps = {
@@ -42,6 +51,9 @@ type IFileManagerProps = {
     activeTreeNode: ITreeDataNode,
     type: FileChangeEnum
   ) => ITreeDataNode | undefined;
+  showButtonList?: ActionButtonEnum[];
+  onRefresh?: () => void;
+  expandAll?: boolean;
 };
 
 const ROOT_FOCUS_KEY = '__ROOT_FOCUS_KEY__';
@@ -83,7 +95,14 @@ function findTargetTreeNode(
 }
 
 export function FileManager(props: IFileManagerProps) {
-  const { onDragStart, onFileChange, getNewFile } = props;
+  const {
+    onDragStart,
+    onFileChange,
+    getNewFile,
+    onRefresh,
+    showButtonList,
+    expandAll
+  } = props;
   const [treeData] = useControllableValue<ITreeDataNode[]>(props, {
     defaultValue: [],
     defaultValuePropName: 'defaultTreeData',
@@ -202,7 +221,6 @@ export function FileManager(props: IFileManagerProps) {
         return;
       }
 
-      console.log('event.key', event.key, event.ctrlKey, event);
       // ============== handle delete ============ //
       if (
         focusKeyRef.current &&
@@ -232,101 +250,104 @@ export function FileManager(props: IFileManagerProps) {
     };
   }, []);
 
+  const actionButtons: {
+    action: ActionButtonEnum;
+    handler: () => void;
+    title: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      action: ActionButtonEnum.AddFile,
+      title: 'Add File',
+      handler: () => {
+        let targetActiveNode = activeOrFocusTreeNode;
+        if (
+          activeOrFocusTreeNode?.isLeaf ||
+          (!activeOrFocusTreeNode?.isLeaf &&
+            !expandedKeys.includes(targetActiveNode?.key || ''))
+        ) {
+          targetActiveNode = activeOrFocusTreeNode?.parent;
+        }
+
+        const newFile = getNewFile?.() || {};
+
+        const pendingAddItem = {
+          title: '',
+          key: Math.random().toString(36),
+          parent: targetActiveNode,
+          isLeaf: true,
+          ...newFile
+        };
+
+        setPendingAddItem(pendingAddItem);
+        setFocusKey(pendingAddItem.key);
+        setEditingKey(pendingAddItem.key);
+      },
+      icon: <FileAddOutlined />
+    },
+    {
+      action: ActionButtonEnum.AddDirectory,
+      title: 'Add Directory',
+      handler: () => {},
+      icon: <FolderAddOutlined />
+    },
+    {
+      action: ActionButtonEnum.Collapse,
+      title: 'Collapse All',
+      handler: () => {
+        setExpandedKeys([]);
+      },
+      icon: <SwitcherOutlined />
+    },
+    {
+      action: ActionButtonEnum.Reveal,
+      title: 'Reveal Active File',
+      handler: () => {
+        const activeNode = findTargetTreeNode(
+          rootTreeData,
+          (treeNode) => treeNode.key === activeKey
+        );
+        const appendKeys: IHandledTreeDataNode['key'][] = [];
+        let currentNode = activeNode;
+        while (currentNode) {
+          appendKeys.push(currentNode.key);
+          currentNode = currentNode.parent;
+        }
+        setExpandedKeys((keys) => {
+          return [...new Set([...keys, ...appendKeys])];
+        });
+      },
+      icon: <AimOutlined />
+    },
+    {
+      action: ActionButtonEnum.Refresh,
+      title: 'Refresh',
+      handler: () => {
+        onRefresh?.();
+      },
+      icon: <ReloadOutlined />
+    }
+  ].filter((item) =>
+    showButtonList ? showButtonList.includes(item.action) : true
+  );
+
   return (
     <div className={css.container}>
       <div className={css['action-container']}>
-        <Tooltip
-          placement="bottom"
-          arrow={false}
-          title={'Add File'}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        >
-          <div
-            className={css['action-icon']}
-            onClick={() => {
-              let targetActiveNode = activeOrFocusTreeNode;
-              if (
-                activeOrFocusTreeNode?.isLeaf ||
-                (!activeOrFocusTreeNode?.isLeaf &&
-                  !expandedKeys.includes(targetActiveNode?.key || ''))
-              ) {
-                targetActiveNode = activeOrFocusTreeNode?.parent;
-              }
-
-              const newFile = getNewFile?.() || {};
-
-              const pendingAddItem = {
-                title: '',
-                key: Math.random().toString(36),
-                parent: targetActiveNode,
-                isLeaf: true,
-                ...newFile
-              };
-
-              setPendingAddItem(pendingAddItem);
-              setFocusKey(pendingAddItem.key);
-              setEditingKey(pendingAddItem.key);
-            }}
+        {actionButtons?.map((item) => (
+          <Tooltip
+            key={item.action}
+            placement="bottom"
+            arrow={false}
+            title={item.title}
+            mouseEnterDelay={0}
+            mouseLeaveDelay={0}
           >
-            <FileAddOutlined />
-          </div>
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          arrow={false}
-          title={'Add Directory'}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        >
-          <div className={css['action-icon']}>
-            <FolderAddOutlined />
-          </div>
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          arrow={false}
-          title={'Collapse All'}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        >
-          <div
-            className={css['action-icon']}
-            onClick={() => {
-              setExpandedKeys([]);
-            }}
-          >
-            <SwitcherOutlined />
-          </div>
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          arrow={false}
-          title={'Reveal Active File'}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        >
-          <div
-            className={css['action-icon']}
-            onClick={() => {
-              const activeNode = findTargetTreeNode(
-                rootTreeData,
-                (treeNode) => treeNode.key === activeKey
-              );
-              const appendKeys: IHandledTreeDataNode['key'][] = [];
-              let currentNode = activeNode;
-              while (currentNode) {
-                appendKeys.push(currentNode.key);
-                currentNode = currentNode.parent;
-              }
-              setExpandedKeys((keys) => {
-                return [...new Set([...keys, ...appendKeys])];
-              });
-            }}
-          >
-            <AimOutlined />
-          </div>
-        </Tooltip>
+            <div className={css['action-icon']} onClick={item.handler}>
+              {item.icon}
+            </div>
+          </Tooltip>
+        ))}
       </div>
       <div
         ref={treeContainerRef}
@@ -353,7 +374,8 @@ export function FileManager(props: IFileManagerProps) {
             editingKey,
             setEditingKey,
             pendingAddItem,
-            handleFileChange
+            handleFileChange,
+            expandAll
           }}
         >
           {rootTreeData?.map((item) => (

@@ -15,12 +15,21 @@ import {
   HistoryWidget
 } from '@designable/react';
 import { SettingsForm, MonacoInput } from '@designable/react-settings-form';
-import { createDesigner, createResource, createBehavior, GlobalRegistry } from '@designable/core';
+import {
+  createDesigner,
+  createResource,
+  createBehavior,
+  GlobalRegistry
+} from '@designable/core';
 import { Content } from './Content';
 import { Input as AtdInput, Switch } from 'antd';
 import { Setting } from './components/Setting';
+import { useUIEditorContext } from '../UIEditorContext';
+import { useEffect } from 'react';
 
-const CompositePanelItem = CompositePanel.Item as NonNullable<typeof CompositePanel.Item>;
+const CompositePanelItem = CompositePanel.Item as NonNullable<
+  typeof CompositePanel.Item
+>;
 
 const RootBehavior = createBehavior({
   name: 'Root',
@@ -92,7 +101,9 @@ const CardBehavior = createBehavior({
     droppable: true,
     resizable: {
       width(node, element) {
-        const width = Number(node.props?.style?.width ?? element.getBoundingClientRect().width);
+        const width = Number(
+          node.props?.style?.width ?? element.getBoundingClientRect().width
+        );
         return {
           plus: () => {
             node.props = node.props || {};
@@ -107,7 +118,9 @@ const CardBehavior = createBehavior({
         };
       },
       height(node, element) {
-        const height = Number(node.props?.style?.height ?? element.getBoundingClientRect().height);
+        const height = Number(
+          node.props?.style?.height ?? element.getBoundingClientRect().height
+        );
         return {
           plus: () => {
             node.props = node.props || {};
@@ -124,7 +137,8 @@ const CardBehavior = createBehavior({
     },
     translatable: {
       x(node, element, diffX) {
-        const left = parseInt(node.props?.style?.left ?? element?.style.left) || 0;
+        const left =
+          parseInt(node.props?.style?.left ?? element?.style.left) || 0;
         const rect = element.getBoundingClientRect();
         return {
           translate: () => {
@@ -163,7 +177,11 @@ const CardBehavior = createBehavior({
   }
 });
 
-GlobalRegistry.setDesignerBehaviors([RootBehavior, InputBehavior, CardBehavior]);
+GlobalRegistry.setDesignerBehaviors([
+  RootBehavior,
+  InputBehavior,
+  CardBehavior
+]);
 
 const Input = createResource({
   title: {
@@ -210,11 +228,20 @@ GlobalRegistry.registerDesignerLocales({
 });
 
 const engine = createDesigner();
+
 export const UIEditor = () => {
+  const { currentTreeData } = useUIEditorContext();
+
+  useEffect(() => {
+    engine.setCurrentTree(currentTreeData);
+  }, [currentTreeData]);
+
   return (
     <Designer engine={engine}>
       <Workbench>
-        <StudioPanel style={{ position: 'static', height: 'calc(100vh - 48px)' }}>
+        <StudioPanel
+          style={{ position: 'static', height: 'calc(100vh - 48px)' }}
+        >
           <CompositePanel>
             <CompositePanelItem title="panels.Component" icon="Component">
               <ResourceWidget title="sources.Inputs" sources={[Input]} />
