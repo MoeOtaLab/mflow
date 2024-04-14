@@ -1,7 +1,8 @@
 import {
+  ApartmentOutlined,
   ControlOutlined,
-  FileAddOutlined,
-  FunctionOutlined
+  FunctionOutlined,
+  SnippetsOutlined
 } from '@ant-design/icons';
 import { OperatorPanel } from '../OperatorPanel';
 import { LayerPanel } from '../LayerPanel';
@@ -21,10 +22,16 @@ export function LeftSidePanel() {
             content: <OperatorPanel />
           },
           {
-            icon: <FileAddOutlined rev="" />,
+            icon: <SnippetsOutlined rev="" />,
             key: 'Layers',
             label: 'Layers',
             content: <LayerPanel />
+          },
+          {
+            icon: <ApartmentOutlined rev="" />,
+            key: 'UI',
+            label: 'UI',
+            content: <div>coming soon</div>
           },
           {
             icon: <ControlOutlined rev="" />,
